@@ -1,0 +1,128 @@
+import Foundation
+import Observation
+
+/// Owns policy only. Core Audio, preferences and time are supplied at the boundary.
+@MainActor @Observable public final class KeeperController {
+    public private(set) var devices: [AudioDevice] = []
+    public private(set) var selectedUID: String?
+    public private(set) var selectedName: String?
+    public private(set) var isEnabled: Bool
+    public private(set) var issue: KeeperIssue?
+    public private(set) var isHolding = false
+
+    @ObservationIgnored private let hardware: any AudioHardware
+    @ObservationIgnored private let settings: any KeeperSettings
+    @ObservationIgnored private let scheduler: any RetryScheduler
+    @ObservationIgnored private let now: () -> TimeInterval
+    @ObservationIgnored private var pending: (any ScheduledAction)?
+    @ObservationIgnored private var generation = 0
+    @ObservationIgnored private var stopped = false
+    @ObservationIgnored private var writeTimes: [TimeInterval] = []
+    @ObservationIgnored private var conflict = false
+    private let retryDelays: [TimeInterval] = [0.25, 0.75, 1.5]
+
+    public init(hardware: any AudioHardware, settings: any KeeperSettings,
+                scheduler: any RetryScheduler, now: @escaping () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }) {
+        self.hardware = hardware; self.settings = settings
+        self.scheduler = scheduler; self.now = now
+        selectedUID = settings.selectedUID; selectedName = settings.selectedName
+        isEnabled = settings.isEnabled && settings.selectedUID != nil
+        refresh()
+    }
+
+    public func setEnabled(_ value: Bool) {
+        guard !stopped else { return }
+        invalidatePending()
+        conflict = false; writeTimes.removeAll()
+        if value && selectedUID == nil {
+            refresh()
+            guard selectedUID != nil else { issue = .chooseDevice; return }
+        }
+        isEnabled = value; settings.isEnabled = value
+        isHolding = false; issue = nil
+        refresh()
+    }
+
+    public func select(_ device: AudioDevice) {
+        guard isEnabled, !stopped, devices.contains(where: { $0.id == device.id }) else { return }
+        saveSelection(device)
+        conflict = false; writeTimes.removeAll()
+        refresh()
+    }
+
+    public func refresh() {
+        guard !stopped else { return }
+        invalidatePending()
+        reconcile(attempt: 0)
+    }
+
+    public func retry() {
+        guard !stopped else { return }
+        conflict = false; writeTimes.removeAll()
+        refresh()
+    }
+
+    /// Stops writes without altering the preference restored on the next launch.
+    public func stop() {
+        stopped = true; isHolding = false
+        invalidatePending()
+    }
+
+    private func saveSelection(_ device: AudioDevice) {
+        selectedUID = device.id; selectedName = device.name
+        settings.selectedUID = device.id; settings.selectedName = device.name
+    }
+
+    private func invalidatePending() {
+        generation += 1
+        pending?.cancel(); pending = nil
+    }
+
+    private func reconcile(attempt: Int) {
+        guard !stopped else { return }
+        isHolding = false
+        do {
+            let snapshot = try hardware.snapshot()
+            devices = snapshot.devices
+            if selectedUID == nil, let suggestion = devices.first(where: { $0.id == snapshot.defaultUID }) ?? devices.first {
+                saveSelection(suggestion)
+            }
+            if let selected = devices.first(where: { $0.id == selectedUID }) {
+                saveSelection(selected)
+            }
+            guard isEnabled else { issue = nil; return }
+            guard !conflict else { issue = .conflict; return }
+            guard let uid = selectedUID else { issue = .chooseDevice; return }
+            guard devices.contains(where: { $0.id == uid }) else {
+                issue = .deviceUnavailable; return
+            }
+            if snapshot.defaultUID == uid { issue = nil; isHolding = true; return }
+
+            let timestamp = now()
+            writeTimes.removeAll { timestamp - $0 >= 10 }
+            guard writeTimes.count < 5 else {
+                conflict = true; issue = .conflict; return
+            }
+            writeTimes.append(timestamp)
+            try hardware.setDefaultInput(uid: uid)
+            let verified = try hardware.snapshot()
+            devices = verified.devices
+            guard verified.defaultUID == uid else {
+                throw VerificationFailure()
+            }
+            issue = nil; isHolding = true
+        } catch {
+            issue = error is VerificationFailure ? .verificationFailed : .audioFailure(error.localizedDescription)
+            guard isEnabled, attempt < retryDelays.count else { return }
+            let expectedGeneration = generation
+            pending = scheduler.schedule(after: retryDelays[attempt]) { [weak self] in
+                guard let self, !self.stopped, self.isEnabled,
+                      self.generation == expectedGeneration else { return }
+                self.pending = nil
+                self.reconcile(attempt: attempt + 1)
+            }
+        }
+    }
+
+    private struct VerificationFailure: Error {}
+}
