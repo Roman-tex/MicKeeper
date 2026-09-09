@@ -1,0 +1,41 @@
+# macOS metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Xcode and SwiftPM build products
+.build/
+.swiftpm/
+DerivedData/
+build/
+Package.resolved
+xcuserdata/
+*.xcuserdatad/
+*.xcuserstate
+*.moved-aside
+*.hmap
+*.dSYM/
+*.dSYM.zip
+
+# Generated distribution artifacts
+dist/
+*.app/
+*.dmg
+*.ipa
+*.zip
+
+# Local editor state
+.idea/
+.vscode/
+
+# Credentials and local environment
+.env
+.env.*
+!.env.example
+*.p12
+*.mobileprovision
+*.provisionprofile
+*.cer
+*.key
+*.pem
