@@ -1,0 +1,30 @@
+name: Build and test
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  macos:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: xcodebuild -version && swift --version
+      - name: Policy and recovery tests
+        run: swift test
+      - name: Build and verify universal DMG
+        run: ./scripts/package-dmg.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MicKeeper-review-build
+          path: |
+            dist/*.dmg
+            dist/*.sha256
+          if-no-files-found: error
