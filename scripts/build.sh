@@ -20,5 +20,7 @@ if [[ "$configuration" == Release ]]; then
     codesign --force --sign - --options runtime --timestamp=none "$app_path"
 fi
 codesign --verify --deep --strict "$app_path"
-lipo "$app_path/Contents/MacOS/MicKeeper" -verify_arch arm64 x86_64
+for architecture in arm64 x86_64; do
+    lipo "$app_path/Contents/MacOS/MicKeeper" -verify_arch "$architecture"
+done
 echo "Built: $app_path"
