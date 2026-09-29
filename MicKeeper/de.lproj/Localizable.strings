@@ -7,19 +7,18 @@
 "app.accessibility.value" = "Halten %@";
 "app.about.title" = "Über MicKeeper";
 
-"panel.holding.toggle" = "Ausgewähltes Mikrofon halten";
-"panel.holding.help" = "Halten ein- oder ausschalten. Auch per Rechtsklick auf das Symbol.";
-"panel.selected" = "Gehalten:";
-"panel.selected.disabled" = "Ausgewählt:";
-"panel.microphone" = "Mikrofon";
-"panel.none" = "Keine Mikrofone";
-"panel.retry" = "Erneut versuchen";
-"panel.login" = "Beim Anmelden starten";
-"panel.login.approval" = "Erlauben Sie den Start beim Anmelden in den macOS-Einstellungen.";
-"panel.login.openSettings" = "Einstellungen öffnen";
-"panel.login.cancel" = "Anfrage abbrechen";
-"panel.about" = "Über …";
-"panel.quit" = "MicKeeper beenden";
+"menu.holding.toggle" = "Ausgewähltes Mikrofon halten";
+"menu.selected" = "Gehalten:";
+"menu.selected.disabled" = "Ausgewählt:";
+"menu.none" = "Keine Mikrofone";
+"menu.error" = "Fehler";
+"menu.retry" = "Erneut versuchen";
+"menu.login" = "Beim Anmelden starten";
+"menu.login.approval" = "Erlauben Sie den Start beim Anmelden in den macOS-Einstellungen.";
+"menu.login.openSettings" = "Einstellungen öffnen";
+"menu.login.cancel" = "Anfrage abbrechen";
+"menu.about" = "Über …";
+"menu.quit" = "MicKeeper beenden";
 "about.language" = "Sprache";
 "language.system" = "Systemsprache";
 
@@ -65,3 +64,6 @@
 
 "login.error.notFound" = "Der Startdienst ist nicht verfügbar. Verschieben Sie die App nach Applications und öffnen Sie sie erneut.";
 "login.error.update" = "Autostart konnte nicht geändert werden. %@";
+"menu.updateAvailable" = "Update verfügbar …";
+"about.automaticUpdates" = "Automatisch nach Updates suchen";
+"about.automaticUpdates.help" = "GitHub einmal täglich prüfen. Updates werden manuell installiert.";

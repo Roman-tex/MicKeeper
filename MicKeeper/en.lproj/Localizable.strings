@@ -7,19 +7,18 @@
 "app.accessibility.value" = "Holding %@";
 "app.about.title" = "About MicKeeper";
 
-"panel.holding.toggle" = "Hold selected microphone";
-"panel.holding.help" = "Turn holding on or off. You can also right-click the menu bar icon.";
-"panel.selected" = "Holding:";
-"panel.selected.disabled" = "Selected:";
-"panel.microphone" = "Microphone";
-"panel.none" = "No microphones";
-"panel.retry" = "Retry";
-"panel.login" = "Launch at login";
-"panel.login.approval" = "Allow launch at login in macOS settings.";
-"panel.login.openSettings" = "Open settings";
-"panel.login.cancel" = "Cancel request";
-"panel.about" = "About…";
-"panel.quit" = "Quit MicKeeper";
+"menu.holding.toggle" = "Hold selected microphone";
+"menu.selected" = "Holding:";
+"menu.selected.disabled" = "Selected:";
+"menu.none" = "No microphones";
+"menu.error" = "Error";
+"menu.retry" = "Retry";
+"menu.login" = "Launch at login";
+"menu.login.approval" = "Allow launch at login in macOS settings.";
+"menu.login.openSettings" = "Open settings";
+"menu.login.cancel" = "Cancel request";
+"menu.about" = "About…";
+"menu.quit" = "Quit MicKeeper";
 "about.language" = "Language";
 "language.system" = "System default";
 
@@ -65,3 +64,6 @@
 
 "login.error.notFound" = "Launch service is unavailable. Move the app to Applications and open it again.";
 "login.error.update" = "Could not change launch at login. %@";
+"menu.updateAvailable" = "Update available…";
+"about.automaticUpdates" = "Automatically check for updates";
+"about.automaticUpdates.help" = "Check GitHub once a day. Updates are installed manually.";

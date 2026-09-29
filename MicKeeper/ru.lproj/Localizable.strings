@@ -7,19 +7,18 @@
 "app.accessibility.value" = "Удержание %@";
 "app.about.title" = "О программе MicKeeper";
 
-"panel.holding.toggle" = "Удерживать выбранный микрофон";
-"panel.holding.help" = "Включить или выключить удержание. Также доступно по правому клику на иконке.";
-"panel.selected" = "Удерживается:";
-"panel.selected.disabled" = "Выбран:";
-"panel.microphone" = "Микрофон";
-"panel.none" = "Нет микрофонов";
-"panel.retry" = "Повторить";
-"panel.login" = "Запускать при входе";
-"panel.login.approval" = "Разрешите автозапуск в настройках macOS.";
-"panel.login.openSettings" = "Открыть настройки";
-"panel.login.cancel" = "Отменить запрос";
-"panel.about" = "О программе…";
-"panel.quit" = "Выйти из MicKeeper";
+"menu.holding.toggle" = "Удерживать выбранный микрофон";
+"menu.selected" = "Удерживается:";
+"menu.selected.disabled" = "Выбран:";
+"menu.none" = "Нет микрофонов";
+"menu.error" = "Ошибка";
+"menu.retry" = "Повторить";
+"menu.login" = "Запускать при входе";
+"menu.login.approval" = "Разрешите автозапуск в настройках macOS.";
+"menu.login.openSettings" = "Открыть настройки";
+"menu.login.cancel" = "Отменить запрос";
+"menu.about" = "О программе…";
+"menu.quit" = "Выйти из MicKeeper";
 "about.language" = "Язык";
 "language.system" = "Язык системы";
 
@@ -65,3 +64,6 @@
 
 "login.error.notFound" = "Служба запуска недоступна. Переместите приложение в Applications и откройте его снова.";
 "login.error.update" = "Не удалось изменить автозапуск. %@";
+"menu.updateAvailable" = "Доступно обновление…";
+"about.automaticUpdates" = "Автоматически проверять обновления";
+"about.automaticUpdates.help" = "Проверять GitHub раз в сутки. Обновления устанавливаются вручную.";

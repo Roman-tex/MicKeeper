@@ -7,19 +7,18 @@
 "app.accessibility.value" = "Утримання %@";
 "app.about.title" = "Про MicKeeper";
 
-"panel.holding.toggle" = "Утримувати вибраний мікрофон";
-"panel.holding.help" = "Увімкнути або вимкнути утримання. Також доступно за правим кліком на іконці.";
-"panel.selected" = "Утримується:";
-"panel.selected.disabled" = "Вибрано:";
-"panel.microphone" = "Мікрофон";
-"panel.none" = "Немає мікрофонів";
-"panel.retry" = "Повторити";
-"panel.login" = "Запускати під час входу";
-"panel.login.approval" = "Дозвольте автозапуск у налаштуваннях macOS.";
-"panel.login.openSettings" = "Відкрити налаштування";
-"panel.login.cancel" = "Скасувати запит";
-"panel.about" = "Про програму…";
-"panel.quit" = "Вийти з MicKeeper";
+"menu.holding.toggle" = "Утримувати вибраний мікрофон";
+"menu.selected" = "Утримується:";
+"menu.selected.disabled" = "Вибрано:";
+"menu.none" = "Немає мікрофонів";
+"menu.error" = "Помилка";
+"menu.retry" = "Повторити";
+"menu.login" = "Запускати під час входу";
+"menu.login.approval" = "Дозвольте автозапуск у налаштуваннях macOS.";
+"menu.login.openSettings" = "Відкрити налаштування";
+"menu.login.cancel" = "Скасувати запит";
+"menu.about" = "Про програму…";
+"menu.quit" = "Вийти з MicKeeper";
 "about.language" = "Мова";
 "language.system" = "Мова системи";
 
@@ -65,3 +64,6 @@
 
 "login.error.notFound" = "Служба запуску недоступна. Перемістіть програму до Applications і відкрийте її знову.";
 "login.error.update" = "Не вдалося змінити автозапуск. %@";
+"menu.updateAvailable" = "Доступне оновлення…";
+"about.automaticUpdates" = "Автоматично перевіряти оновлення";
+"about.automaticUpdates.help" = "Перевіряти GitHub раз на добу. Оновлення встановлюються вручну.";

@@ -30,6 +30,7 @@ import MicKeeperCore
             }
         }
         restartMonitoring()
+        updates.start()
     }
     func restartMonitoring() {
         guard !stopped else { return }
@@ -55,16 +56,12 @@ import MicKeeperCore
             }
         }
     }
-    func refreshForPresentation() {
-        login.refresh()
-        if monitoringIssue != nil { restartMonitoring() }
-        keeper.refresh()
-    }
     func retry() { keeper.retry(); restartMonitoring() }
     func stop() {
         stopped = true
         restartTask?.cancel(); restartTask = nil
         keeper.stop(); hardware.stopMonitoring(); hardware.onEvent = nil
+        updates.stop()
     }
     var issueMessage: String? {
         if let monitoringIssue {

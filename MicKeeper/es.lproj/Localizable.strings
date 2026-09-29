@@ -7,19 +7,18 @@
 "app.accessibility.value" = "Retención %@";
 "app.about.title" = "Acerca de MicKeeper";
 
-"panel.holding.toggle" = "Mantener el micrófono seleccionado";
-"panel.holding.help" = "Activa o desactiva la retención. También puedes hacer clic derecho en el icono.";
-"panel.selected" = "Se mantiene:";
-"panel.selected.disabled" = "Seleccionado:";
-"panel.microphone" = "Micrófono";
-"panel.none" = "No hay micrófonos";
-"panel.retry" = "Reintentar";
-"panel.login" = "Abrir al iniciar sesión";
-"panel.login.approval" = "Permite el inicio de sesión en los ajustes de macOS.";
-"panel.login.openSettings" = "Abrir ajustes";
-"panel.login.cancel" = "Cancelar solicitud";
-"panel.about" = "Acerca de…";
-"panel.quit" = "Salir de MicKeeper";
+"menu.holding.toggle" = "Mantener el micrófono seleccionado";
+"menu.selected" = "Se mantiene:";
+"menu.selected.disabled" = "Seleccionado:";
+"menu.none" = "No hay micrófonos";
+"menu.error" = "Error";
+"menu.retry" = "Reintentar";
+"menu.login" = "Abrir al iniciar sesión";
+"menu.login.approval" = "Permite el inicio de sesión en los ajustes de macOS.";
+"menu.login.openSettings" = "Abrir ajustes";
+"menu.login.cancel" = "Cancelar solicitud";
+"menu.about" = "Acerca de…";
+"menu.quit" = "Salir de MicKeeper";
 "about.language" = "Idioma";
 "language.system" = "Idioma del sistema";
 
@@ -65,3 +64,6 @@
 
 "login.error.notFound" = "El servicio de inicio no está disponible. Mueve la aplicación a Applications y ábrela de nuevo.";
 "login.error.update" = "No se pudo cambiar el inicio de sesión. %@";
+"menu.updateAvailable" = "Actualización disponible…";
+"about.automaticUpdates" = "Buscar actualizaciones automáticamente";
+"about.automaticUpdates.help" = "Consultar GitHub una vez al día. Las actualizaciones se instalan manualmente.";

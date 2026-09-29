@@ -33,6 +33,14 @@ struct AboutView: View {
                 }
                 .labelsHidden().pickerStyle(.menu)
             }
+            Toggle(L10n.text("about.automaticUpdates"), isOn: Binding(
+                get: { updates.automatic.isEnabled },
+                set: { updates.setAutomaticEnabled($0) }
+            ))
+            .toggleStyle(.checkbox)
+            .font(.callout)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .help(L10n.text("about.automaticUpdates.help"))
             HStack(spacing: 16) {
                 Link("GitHub", destination: projectURL)
                 Link(L10n.text("about.developer"), destination: URL(string: "https://github.com/Roman-tex")!)
@@ -67,7 +75,7 @@ struct AboutView: View {
             }.padding(20).frame(width: 520, height: 440)
         }
     }
-    private var isChecking: Bool { if case .checking = updates.state { true } else { false } }
+    private var isChecking: Bool { updates.isChecking }
     @ViewBuilder private var updateStatus: some View {
         switch updates.state {
         case .idle, .checking: EmptyView()

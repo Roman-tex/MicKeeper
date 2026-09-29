@@ -7,19 +7,18 @@
 "app.accessibility.value" = "保持 %@";
 "app.about.title" = "关于 MicKeeper";
 
-"panel.holding.toggle" = "保持选定的麦克风";
-"panel.holding.help" = "开启或关闭保持功能。也可以右键点击菜单栏图标。";
-"panel.selected" = "保持:";
-"panel.selected.disabled" = "已选择:";
-"panel.microphone" = "麦克风";
-"panel.none" = "没有可用的麦克风";
-"panel.retry" = "重试";
-"panel.login" = "登录时启动";
-"panel.login.approval" = "请在 macOS 设置中允许登录时启动。";
-"panel.login.openSettings" = "打开设置";
-"panel.login.cancel" = "取消请求";
-"panel.about" = "关于…";
-"panel.quit" = "退出 MicKeeper";
+"menu.holding.toggle" = "保持选定的麦克风";
+"menu.selected" = "保持:";
+"menu.selected.disabled" = "已选择:";
+"menu.none" = "没有可用的麦克风";
+"menu.error" = "错误";
+"menu.retry" = "重试";
+"menu.login" = "登录时启动";
+"menu.login.approval" = "请在 macOS 设置中允许登录时启动。";
+"menu.login.openSettings" = "打开设置";
+"menu.login.cancel" = "取消请求";
+"menu.about" = "关于…";
+"menu.quit" = "退出 MicKeeper";
 "about.language" = "语言";
 "language.system" = "跟随系统";
 
@@ -65,3 +64,6 @@
 
 "login.error.notFound" = "启动服务不可用。请将应用移到 Applications 后重新打开。";
 "login.error.update" = "无法更改登录时启动设置。%@";
+"menu.updateAvailable" = "有可用更新…";
+"about.automaticUpdates" = "自动检查更新";
+"about.automaticUpdates.help" = "每天在 GitHub 上检查一次。更新需手动安装。";
