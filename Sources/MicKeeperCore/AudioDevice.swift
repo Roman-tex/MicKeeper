@@ -31,5 +31,5 @@ public struct AudioSnapshot: Sendable {
 }
 
 public enum KeeperIssue: Equatable, Sendable {
-    case chooseDevice, deviceUnavailable, audioFailure(String), verificationFailed, conflict
+    case chooseDevice, deviceUnavailable, audioFailure(String), verificationFailed
 }

@@ -86,7 +86,6 @@ import MicKeeperCore
         case .deviceUnavailable: return L10n.text("error.deviceUnavailable")
         case .audioFailure(let message): return L10n.format("error.audio", message)
         case .verificationFailed: return L10n.text("error.verification")
-        case .conflict: return L10n.text("error.conflict")
         }
     }
 }

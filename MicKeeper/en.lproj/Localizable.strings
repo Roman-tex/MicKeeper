@@ -28,7 +28,6 @@
 "error.audio" = "Audio system error: %@";
 "error.monitoring.core" = "Device monitoring is unavailable. Could not start monitoring (Core Audio: %@).";
 "error.verification" = "The audio system did not confirm the microphone switch.";
-"error.conflict" = "Another app keeps changing the microphone. Automatic changes are paused until you retry.";
 "error.monitoring" = "Device monitoring is unavailable. %@";
 "core.error.readProperty" = "Could not read the audio property";
 "core.error.badPropertySize" = "The audio property has an invalid size";

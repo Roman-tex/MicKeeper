@@ -28,7 +28,6 @@
 "error.audio" = "Error del sistema de audio: %@";
 "error.monitoring.core" = "La supervisión de dispositivos no está disponible. No se pudo iniciar la supervisión (Core Audio: %@).";
 "error.verification" = "El sistema de audio no confirmó el cambio de micrófono.";
-"error.conflict" = "Otra aplicación cambia el micrófono continuamente. Los cambios automáticos están en pausa hasta que vuelvas a intentarlo.";
 "error.monitoring" = "La supervisión de dispositivos no está disponible. %@";
 "core.error.readProperty" = "No se pudo leer la propiedad de audio";
 "core.error.badPropertySize" = "La propiedad de audio tiene un tamaño no válido";

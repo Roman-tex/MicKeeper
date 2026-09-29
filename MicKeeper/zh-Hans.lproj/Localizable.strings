@@ -29,7 +29,6 @@
 "error.verification" = "音频系统未确认麦克风切换。";
 "error.monitoring" = "设备监控不可用。%@";
 "error.monitoring.core" = "设备监控不可用。无法启动监控（Core Audio：%@）。";
-"error.conflict" = "其他应用正在不断更改麦克风。自动更改已暂停，请重试。";
 "core.error.readProperty" = "无法读取音频属性";
 "core.error.badPropertySize" = "音频属性的大小无效";
 "core.error.readName" = "无法读取设备名称或标识符";

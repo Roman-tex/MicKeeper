@@ -18,7 +18,8 @@ import Observation
     @ObservationIgnored private var generation = 0
     @ObservationIgnored private var stopped = false
     @ObservationIgnored private var writeTimes: [TimeInterval] = []
-    @ObservationIgnored private var conflict = false
+    private let maximumWritesPerWindow = 5
+    private let writeWindow: TimeInterval = 10
     private let retryDelays: [TimeInterval] = [0.25, 0.75, 1.5]
 
     public init(hardware: any AudioHardware, settings: any KeeperSettings,
@@ -33,7 +34,7 @@ import Observation
     public func setEnabled(_ value: Bool) {
         guard !stopped else { return }
         invalidatePending()
-        conflict = false; writeTimes.removeAll()
+        writeTimes.removeAll()
         if value && selectedUID == nil {
             refresh()
             guard selectedUID != nil else { issue = .chooseDevice; return }
@@ -45,20 +46,23 @@ import Observation
 
     public func select(_ device: AudioDevice) {
         guard isEnabled, !stopped, devices.contains(where: { $0.id == device.id }) else { return }
+        invalidatePending()
         saveSelection(device)
-        conflict = false; writeTimes.removeAll()
+        writeTimes.removeAll()
         refresh()
     }
 
     public func refresh() {
         guard !stopped else { return }
-        invalidatePending()
-        reconcile(attempt: 0)
+        // Events can repeat while a device is applying a change. Read the latest
+        // state, but keep the existing retry deadline instead of writing again.
+        reconcile(attempt: 0, canWrite: pending == nil)
     }
 
     public func retry() {
         guard !stopped else { return }
-        conflict = false; writeTimes.removeAll()
+        invalidatePending()
+        writeTimes.removeAll()
         refresh()
     }
 
@@ -78,7 +82,7 @@ import Observation
         pending?.cancel(); pending = nil
     }
 
-    private func reconcile(attempt: Int) {
+    private func reconcile(attempt: Int, canWrite: Bool = true) {
         guard !stopped else { return }
         isHolding = false
         do {
@@ -90,18 +94,26 @@ import Observation
             if let selected = devices.first(where: { $0.id == selectedUID }) {
                 saveSelection(selected)
             }
-            guard isEnabled else { issue = nil; return }
-            guard !conflict else { issue = .conflict; return }
+            guard isEnabled else { invalidatePending(); issue = nil; return }
             guard let uid = selectedUID else { issue = .chooseDevice; return }
             guard devices.contains(where: { $0.id == uid }) else {
+                invalidatePending()
                 issue = .deviceUnavailable; return
             }
-            if snapshot.defaultUID == uid { issue = nil; isHolding = true; return }
+            if snapshot.defaultUID == uid {
+                invalidatePending()
+                issue = nil; isHolding = true; return
+            }
+            guard canWrite else { return }
 
             let timestamp = now()
-            writeTimes.removeAll { timestamp - $0 >= 10 }
-            guard writeTimes.count < 5 else {
-                conflict = true; issue = .conflict; return
+            writeTimes.removeAll { timestamp - $0 >= writeWindow }
+            if writeTimes.count >= maximumWritesPerWindow, let oldest = writeTimes.first {
+                // Limit write bursts without permanently abandoning the user's
+                // choice or claiming to know which process changed the input.
+                issue = nil
+                scheduleReconciliation(after: max(0.01, oldest + writeWindow - timestamp), attempt: 0)
+                return
             }
             writeTimes.append(timestamp)
             try hardware.setDefaultInput(uid: uid)
@@ -113,14 +125,18 @@ import Observation
             issue = nil; isHolding = true
         } catch {
             issue = error is VerificationFailure ? .verificationFailed : .audioFailure(error.localizedDescription)
-            guard isEnabled, attempt < retryDelays.count else { return }
-            let expectedGeneration = generation
-            pending = scheduler.schedule(after: retryDelays[attempt]) { [weak self] in
-                guard let self, !self.stopped, self.isEnabled,
-                      self.generation == expectedGeneration else { return }
-                self.pending = nil
-                self.reconcile(attempt: attempt + 1)
-            }
+            guard canWrite, isEnabled, attempt < retryDelays.count else { return }
+            scheduleReconciliation(after: retryDelays[attempt], attempt: attempt + 1)
+        }
+    }
+
+    private func scheduleReconciliation(after delay: TimeInterval, attempt: Int) {
+        let expectedGeneration = generation
+        pending = scheduler.schedule(after: delay) { [weak self] in
+            guard let self, !self.stopped, self.isEnabled,
+                  self.generation == expectedGeneration else { return }
+            self.pending = nil
+            self.reconcile(attempt: attempt)
         }
     }
 

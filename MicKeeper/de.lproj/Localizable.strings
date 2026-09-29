@@ -28,7 +28,6 @@
 "error.audio" = "Audiofehler: %@";
 "error.monitoring.core" = "Die Geräteüberwachung ist nicht verfügbar. Überwachung konnte nicht gestartet werden (Core Audio: %@).";
 "error.verification" = "Das Audiosystem hat die Mikrofonänderung nicht bestätigt.";
-"error.conflict" = "Eine andere App ändert das Mikrofon fortlaufend. Automatische Änderungen sind bis zu einem neuen Versuch pausiert.";
 "error.monitoring" = "Die Geräteüberwachung ist nicht verfügbar. %@";
 "core.error.readProperty" = "Audioeigenschaft konnte nicht gelesen werden";
 "core.error.badPropertySize" = "Die Audioeigenschaft hat eine ungültige Größe";

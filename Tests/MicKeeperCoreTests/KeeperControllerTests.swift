@@ -28,13 +28,14 @@ import Testing
 @MainActor final class ManualScheduler: RetryScheduler {
     final class Entry: ScheduledAction {
         let action: @MainActor () -> Void
+        let delay: TimeInterval
         var cancelled = false
-        init(_ action: @escaping @MainActor () -> Void) { self.action = action }
+        init(delay: TimeInterval, _ action: @escaping @MainActor () -> Void) { self.delay = delay; self.action = action }
         func cancel() { cancelled = true }
     }
     var entries: [Entry] = []
     func schedule(after delay: TimeInterval, action: @escaping @MainActor () -> Void) -> any ScheduledAction {
-        let entry = Entry(action); entries.append(entry); return entry
+        let entry = Entry(delay: delay, action); entries.append(entry); return entry
     }
     func runAll(includingCancelled: Bool = false) {
         var limit = 30
@@ -49,8 +50,8 @@ import Testing
     let audio = FakeAudio()
     let settings = MemorySettings()
     let scheduler = ManualScheduler()
-    func controller() -> KeeperController {
-        KeeperController(hardware: audio, settings: settings, scheduler: scheduler, now: { 100 })
+    func controller(now: @escaping () -> TimeInterval = { 100 }) -> KeeperController {
+        KeeperController(hardware: audio, settings: settings, scheduler: scheduler, now: now)
     }
 }
 
@@ -116,14 +117,66 @@ import Testing
         #expect(c.issue != nil)
         #expect(f.audio.writes.count == 4)
     }
-    @Test func repeatedExternalOverridesTripConflictProtection() {
+    @Test func repeatedOverridesLimitWritesWithoutReportingAnError() {
         let f = Fixture(); let c = f.controller(); c.setEnabled(true)
         for _ in 0..<12 { f.audio.current = "other"; c.refresh() }
         #expect(f.audio.writes.count == 5)
-        #expect(c.issue == .conflict)
+        #expect(c.issue == nil)
         c.retry()
         #expect(f.audio.writes.count == 6)
         #expect(c.isHolding)
+    }
+    @Test func switchingLimitRecoversAutomaticallyAfterCooldown() {
+        let f = Fixture(); var time: TimeInterval = 100
+        let c = f.controller(now: { time }); c.setEnabled(true)
+        for _ in 0..<12 { f.audio.current = "other"; c.refresh() }
+        #expect(f.audio.writes.count == 5)
+        #expect(c.issue == nil)
+        time += 10
+        f.scheduler.runAll()
+        #expect(f.audio.writes.count == 6)
+        #expect(c.isHolding)
+        #expect(c.issue == nil)
+    }
+    @Test func correctInputClearsSwitchingLimitWithoutManualRetry() {
+        let f = Fixture(); let c = f.controller(); c.setEnabled(true)
+        for _ in 0..<12 { f.audio.current = "other"; c.refresh() }
+        f.audio.current = "preferred"; c.refresh()
+        #expect(c.issue == nil)
+        #expect(c.isHolding)
+        #expect(f.audio.writes.count == 5)
+    }
+    @Test func repeatedNotificationsDoNotSkipPendingRetryDelay() {
+        let f = Fixture(); f.audio.ignoresWrite = true
+        let c = f.controller(); c.setEnabled(true)
+        for _ in 0..<12 { c.refresh() }
+        #expect(f.audio.writes.count == 1)
+        #expect(c.issue == .verificationFailed)
+        f.audio.ignoresWrite = false
+        f.scheduler.runAll()
+        #expect(f.audio.writes.count == 2)
+        #expect(c.isHolding)
+    }
+    @Test func delayedSuccessfulSwitchCancelsPendingRetry() {
+        let f = Fixture(); f.audio.ignoresWrite = true
+        let c = f.controller(); c.setEnabled(true)
+        f.audio.current = "preferred"; c.refresh()
+        f.scheduler.runAll(includingCancelled: true)
+        #expect(f.audio.writes.count == 1)
+        #expect(c.isHolding)
+        #expect(c.issue == nil)
+    }
+    @Test func disablingDuringCooldownCancelsAutomaticRecovery() {
+        let f = Fixture(); var time: TimeInterval = 100
+        let c = f.controller(now: { time }); c.setEnabled(true)
+        for _ in 0..<12 { f.audio.current = "other"; c.refresh() }
+        c.setEnabled(false)
+        time += 10
+        f.scheduler.runAll(includingCancelled: true)
+        #expect(f.audio.writes.count == 5)
+        #expect(!c.isEnabled)
+        #expect(!c.isHolding)
+        #expect(c.issue == nil)
     }
     @Test func enumerationFailureIsNotAnEmptyDeviceList() {
         let f = Fixture(); let c = f.controller(); c.refresh()
