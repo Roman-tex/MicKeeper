@@ -12,16 +12,18 @@ Built with **Swift 6**, **SwiftUI**, **AppKit** and **Core Audio**. Targets **ma
 
 ## What it does
 
-- Select an input device directly from the menu bar panel.
-- Enable or disable holding with a switch, or **right-click the menu bar icon**.
+- Select an input device directly from the native menu bar menu.
+- Enable or disable holding with a checkable menu item, or **right-click the menu bar icon**.
 - Keep the selection visible, grey and inactive while holding is off.
 - Remember the preferred device across app launches and device reconnections.
 - Optionally launch at login using the system's login-item service.
-- View version, developer and licenses, and manually check GitHub for a stable release.
+- View version, developer and licenses, and check GitHub for stable releases automatically or manually.
 
-The panel and About window are localized in **Russian**, **English**, **Ukrainian**, **German**, **Spanish** and **Simplified Chinese**. MicKeeper follows the first supported language in macOS' preferred language list; unsupported languages fall back to English. You can override the language in **About MicKeeper → Language**; the choice is stored locally and applies immediately. Device names come from macOS and are shown as provided by the driver.
+The menu and About window are localized in **Russian**, **English**, **Ukrainian**, **German**, **Spanish** and **Simplified Chinese**. MicKeeper follows the first supported language in macOS' preferred language list; unsupported languages fall back to English. You can override the language in **About MicKeeper → Language**; the choice is stored locally and applies immediately. Device names come from macOS and are shown as provided by the driver.
 
-The first launch opens the panel to make the icon easy to find. Holding and launch at login are off by default. Opening the app again from Finder reopens the panel.
+The first launch opens the menu to make the icon easy to find. Holding and launch at login are off by default. Opening the app again from Finder reopens the menu.
+
+Automatic update checks are on by default. Change **About MicKeeper → Automatically check for updates** to disable them. Checks run when the app starts if due, then once per day while it is running. The last attempt is remembered across launches. A new stable release adds an **Update available…** menu item; installation stays manual. Background connection failures are quiet, and the manual **Check for Updates** button remains available.
 
 **The crossed-out icon means holding is off. It does not mute the microphone.**
 
@@ -32,11 +34,11 @@ The current `0.1.0` build is a review candidate. A published download will appea
 1. Open `MicKeeper-0.1.0-universal.dmg`.
 2. Drag **MicKeeper** into **Applications** and eject the disk image.
 3. Open MicKeeper from Applications.
-4. Enable holding and choose your microphone in the panel.
+4. Enable holding and choose your microphone in the menu.
 
 This build uses **ad-hoc signing**, without a Developer ID certificate or Apple notarization. A downloaded copy may be blocked on its first launch. If you trust the build, attempt to open it, then use **System Settings → Privacy & Security → Open Anyway**, following [Apple's instructions](https://support.apple.com/en-gb/102445). You do not need to disable Gatekeeper. Managed Macs may enforce stricter installation policies.
 
-For launch at login, run the installed copy from Applications. If macOS requires approval, the panel provides a link to Login Items settings and displays the actual registration state.
+For launch at login, run the installed copy from Applications. If macOS requires approval, the menu provides a link to Login Items settings and displays the actual registration state.
 
 ## Behavior and limits
 
@@ -48,9 +50,11 @@ For launch at login, run the installed copy from Applications. If macOS requires
 | App quits | Stops holding without restoring an earlier input. The enabled preference is kept for the next launch. |
 | Sleep, wake or audio service reset | Refreshes devices and re-establishes event subscriptions. |
 | Temporary read/write failure | Retries with bounded delays and shows an actionable error if recovery fails. |
-| Another app repeatedly overrides the input | Stops automatic writes after the conflict limit; asks for a manual retry. |
+| Input changes repeatedly | Limits bursts to five writes per ten seconds, then resumes automatically. No manual reset is required. |
 
-MicKeeper changes the **system default input**. Apps that explicitly select their own microphone may ignore this setting. It reacts to changes rather than preventing them, so a brief transition or audio interruption is possible. The icon shows whether holding is enabled; a problem is explained in the panel and tooltip. It never changes the output device or input volume.
+MicKeeper changes the **system default input**. Apps that explicitly select their own microphone may ignore this setting. It reacts to changes rather than preventing them, so a brief transition or audio interruption is possible. The icon shows whether holding is enabled; a problem is explained in the menu and tooltip. It never changes the output device or input volume.
+
+An **Error** submenu contains wrapped details and, for audio errors, a retry action. Long system messages do not widen the main menu.
 
 Devices are identified by persistent Core Audio UIDs, not names. If a driver or virtual device changes its UID, select it again. Full hardware and OS verification is tracked in [TESTING.md](docs/TESTING.md); setting a deployment target alone is not evidence of testing on that OS.
 
@@ -58,13 +62,13 @@ Devices are identified by persistent Core Audio UIDs, not names. If a driver or 
 
 MicKeeper does not record, process or transmit audio. It reads audio-device metadata and changes the system default input. It does not request microphone capture, Accessibility or administrator access for this function.
 
-Preferences stay in local UserDefaults. Diagnostics use Apple's unified logging with the `io.github.Roman-tex.MicKeeper` subsystem; device UIDs and user-assigned names are not logged. There is no analytics or background update polling.
+Preferences stay in local UserDefaults. Diagnostics use Apple's unified logging with the `io.github.Roman-tex.MicKeeper` subsystem; device UIDs and user-assigned names are not logged. There is no analytics.
 
-**Check for Updates** sends a user-initiated HTTPS request to GitHub's public releases API. Normal connection metadata, including your IP address, is visible to GitHub. The app only offers the official release page; it does not download or install updates itself.
+Update checks send HTTPS requests to GitHub's public releases API: once per day when automatic checks are enabled, or when you press **Check for Updates**. Normal connection metadata, including your IP address, is visible to GitHub. The app only offers the official release page; it does not download or install updates itself. Turning off automatic checks cancels the scheduled check and any background request in progress.
 
 ## Build and run
 
-Requirements: Xcode with a Swift 6 toolchain and macOS 15+ SDK. The review build was developed with Xcode 26.6. No paid Apple Developer membership is required for local builds or DMG packaging.
+Requirements: Xcode with a Swift 6 toolchain and macOS 15+ SDK. No paid Apple Developer membership is required for local builds or DMG packaging.
 
 Open `MicKeeper.xcodeproj`, select the **MicKeeper** scheme and **My Mac**, then Run. The project is configured for local ad-hoc signing.
 
@@ -86,7 +90,7 @@ The scripts build both `arm64` and `x86_64`, verify the signature and binary arc
 ## How it is built
 
 ```text
-AppKit status item ── SwiftUI panel / About
+AppKit status item ── native NSMenu / SwiftUI About
                           │
                       AppModel
                           │
@@ -100,8 +104,8 @@ AppKit status item ── SwiftUI panel / About
 - **KeeperController** serializes policy on the main actor, reconciles device snapshots, verifies writes and invalidates delayed work when intent changes.
 - **CoreAudioHardware** contains checked C API calls and resolves a saved UID against the current device list before every write.
 - **AudioEventMonitor** owns registration lifetimes. Optional per-device failures cannot dismantle system recovery listeners; obsolete callbacks are ignored.
-- **SwiftUI / AppKit** provide native controls, keyboard access and a dedicated right-click action without an extra background daemon.
-- **ServiceManagement / URLSession** handle login items and a manually requested release check.
+- **AppKit NSMenu / SwiftUI** provide native menu behavior, keyboard access, a centered About window and a dedicated right-click action without an extra background daemon.
+- **ServiceManagement / URLSession** handle login items and release checks. **UpdateCheckSchedule** owns the persisted daily schedule and cancels obsolete callbacks.
 
 Tests replace only external boundaries—hardware, time and listener registration—so device loss, stale callbacks and write conflicts are reproducible without changing the test machine's microphone. See [TESTING.md](docs/TESTING.md) for validation and outstanding hardware checks.
 
