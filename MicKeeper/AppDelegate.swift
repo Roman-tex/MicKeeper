@@ -268,6 +268,9 @@ import MicKeeperCore
         menu.cancelTracking()
         if aboutWindow == nil {
             let hosting = NSHostingController(rootView: AboutView(updates: model.updates, language: model.language))
+            // Size the window from SwiftUI's ideal size up front; otherwise it is
+            // resized after the first layout pass, which moves it off centre.
+            hosting.sizingOptions = .preferredContentSize
             let window = NSWindow(contentViewController: hosting)
             window.title = L10n.text("app.about.title")
             window.styleMask = [.titled, .closable]
@@ -275,10 +278,23 @@ import MicKeeperCore
             window.animationBehavior = .none
             aboutWindow = NSWindowController(window: window)
         }
+        guard let window = aboutWindow?.window else { return }
+        if !window.isVisible {
+            // Position before ordering front so the window never visibly jumps.
+            // `center()` sits above the middle by design; use the exact centre of
+            // the screen whose menu bar was clicked.
+            if let content = window.contentViewController?.view {
+                content.layoutSubtreeIfNeeded()
+                window.setContentSize(content.fittingSize)
+            }
+            if let screen = statusItem.button?.window?.screen ?? NSScreen.main {
+                let area = screen.visibleFrame
+                window.setFrameOrigin(NSPoint(x: (area.midX - window.frame.width / 2).rounded(),
+                                              y: (area.midY - window.frame.height / 2).rounded()))
+            }
+        }
         NSApp.activate()
-        aboutWindow?.showWindow(nil)
-        aboutWindow?.window?.center()
-        aboutWindow?.window?.makeKeyAndOrderFront(nil)
+        window.makeKeyAndOrderFront(nil)
     }
 
     func applicationWillTerminate(_ notification: Notification) {
