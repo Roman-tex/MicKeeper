@@ -27,8 +27,21 @@ tiffutil -cathidpicheck "$art_dir/background.png" "$art_dir/background@2x.png" -
 # Build a writable image, drop the background bookmark Finder cannot resolve,
 # then compress it.
 rw_dmg="$art_dir/MicKeeper-rw.dmg"
-"$venv/bin/dmgbuild" -s scripts/dmg/settings.py \
-    -D app="$app_path" -D background="$art_dir/background.tiff" "MicKeeper" "$rw_dmg"
+# On hosted CI runners the freshly attached volume occasionally disappears
+# while dmgbuild copies into it; a clean retry succeeds.
+for attempt in 1 2 3; do
+    rm -f "$rw_dmg"
+    if "$venv/bin/dmgbuild" -s scripts/dmg/settings.py \
+        -D app="$app_path" -D background="$art_dir/background.tiff" "MicKeeper" "$rw_dmg"; then
+        break
+    fi
+    if [[ $attempt == 3 ]]; then
+        echo "dmgbuild failed three times" >&2
+        exit 1
+    fi
+    echo "dmgbuild failed (attempt $attempt), retrying" >&2
+    sleep 5
+done
 mount_point="$art_dir/volume"
 mkdir -p "$mount_point"
 hdiutil attach -quiet -readwrite -nobrowse -noautoopen -mountpoint "$mount_point" "$rw_dmg"
