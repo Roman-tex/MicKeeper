@@ -11,9 +11,9 @@ struct AboutView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            Image("MicrophoneOn").renderingMode(.template)
-                .resizable().scaledToFit().frame(width: 40, height: 40)
-                .padding(.top, 4).accessibilityHidden(true)
+            Image(nsImage: NSApp.applicationIconImage)
+                .resizable().scaledToFit().frame(width: 72, height: 72)
+                .accessibilityHidden(true)
             VStack(spacing: 5) {
                 Text("MicKeeper").font(.system(size: 23, weight: .semibold))
                 Text(L10n.format("about.version", version, build)).font(.callout).foregroundStyle(.secondary)
