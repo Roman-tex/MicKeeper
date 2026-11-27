@@ -63,6 +63,17 @@ import Testing
         #expect(c.isHolding)
         #expect(f.settings.isEnabled)
     }
+    @Test func restorationsCountOnlyVerifiedSwitches() {
+        let f = Fixture(); let c = f.controller()
+        c.setEnabled(true)
+        #expect(c.restorations == 1)
+        c.refresh()
+        #expect(c.restorations == 1)
+        f.audio.current = "other"; c.refresh()
+        #expect(c.restorations == 2)
+        f.audio.current = "other"; f.audio.ignoresWrite = true; c.refresh()
+        #expect(c.restorations == 2)
+    }
     @Test func disabledControllerNeverWritesAndPreservesSelection() {
         let f = Fixture(); let c = f.controller()
         c.refresh(); c.select(f.audio.devices[1])

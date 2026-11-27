@@ -9,6 +9,8 @@ import Observation
     public private(set) var isEnabled: Bool
     public private(set) var issue: KeeperIssue?
     public private(set) var isHolding = false
+    /// Number of verified switches back to the selected input since launch.
+    public private(set) var restorations = 0
 
     @ObservationIgnored private let hardware: any AudioHardware
     @ObservationIgnored private let settings: any KeeperSettings
@@ -122,6 +124,7 @@ import Observation
             guard verified.defaultUID == uid else {
                 throw VerificationFailure()
             }
+            restorations += 1
             issue = nil; isHolding = true
         } catch {
             issue = error is VerificationFailure ? .verificationFailed : .audioFailure(error.localizedDescription)
