@@ -157,7 +157,7 @@ The policy lives in the `MicKeeperCore` Swift package. Its tests replace only th
 
 ## Feedback
 
-Bug reports and suggestions are welcome in [Issues](https://github.com/Roman-tex/MicKeeper/issues). Please include your macOS version, Mac model and the microphones involved.
+Bug reports and suggestions are welcome in [Issues](https://github.com/Roman-tex/MicKeeper/issues). Please include your macOS version, Mac model and the microphones involved. See [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
 
 ## License
 

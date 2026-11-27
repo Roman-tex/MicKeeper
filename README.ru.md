@@ -138,7 +138,7 @@ swift test                 # тесты логики и восстановлен
 
 ## Обратная связь
 
-Ошибки и предложения — в [Issues](https://github.com/Roman-tex/MicKeeper/issues). Укажите версию macOS, модель Mac и используемые микрофоны.
+Ошибки и предложения — в [Issues](https://github.com/Roman-tex/MicKeeper/issues). Укажите версию macOS, модель Mac и используемые микрофоны. Перед pull request прочитайте [CONTRIBUTING.md](CONTRIBUTING.md) (на английском).
 
 ## Лицензия
 
