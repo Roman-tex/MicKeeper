@@ -14,7 +14,7 @@ jobs:
       # The app icon is an Icon Composer 27 document; older actool cannot read it.
       DEVELOPER_DIR: /Applications/Xcode_27.2.app/Contents/Developer
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Tests
         run: swift test
       - name: Build universal DMG
@@ -27,7 +27,7 @@ jobs:
       # GitHub offers attestations for public repositories on free plans.
       - name: Attest build provenance
         if: ${{ !github.event.repository.private }}
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: dist/MicKeeper.dmg
       # New tags get a draft to review and publish manually. Re-running the job
