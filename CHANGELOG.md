@@ -1,19 +1,19 @@
 # Changelog
 
-## 0.1.0 — local review candidate
+All notable changes to MicKeeper are documented here. Versions follow [Semantic Versioning](https://semver.org).
 
-- Native AppKit menu with a selectable preferred input and a checkable holding item.
-- Right-click toggle and separate enabled/disabled menu bar icons.
-- Persistent selection, system event monitoring and bounded recovery attempts.
-- Burst limiting with automatic recovery, and cancellation of stale callbacks and retries.
-- Repeated audio notifications preserve pending retry delays instead of causing immediate duplicate writes.
-- System-managed launch at login with approval/error handling.
-- About window, bundled licenses, daily automatic stable-release checks and a persisted opt-out checkbox; manual checks remain available.
-- Compact Error submenus with wrapped details keep long system messages out of the main menu.
-- Localized menu and About window in Russian, English, Ukrainian, German, Spanish and Simplified Chinese, with an in-app language override.
-- Core Audio monitoring keeps working when a macOS release does not expose the optional service-restart property.
-- Native menu opens without popover animation; the About window opens centered.
-- Launch-at-login failures remain visible after the status refresh.
-- Universal ad-hoc-signed app and drag-to-Applications DMG.
+## 0.1.0 — 2026-11-27
 
-This version has not been published or notarized. See `docs/TESTING.md` for validation scope.
+First public release.
+
+- Keeps the selected microphone as the system default input and restores it when another device takes over.
+- Native menu bar menu: input selection, holding toggle, launch at login, About window.
+- Right-click the menu bar icon to turn holding on or off.
+- Monochrome SF Symbols menu bar icon: filled while holding, outlined when off, with badges for a missing device and for errors. Magic Replace morphs between states and a single bounce marks a restore; both are skipped with Reduce Motion.
+- App icon made in Icon Composer with light, dark and tinted appearances.
+- Remembers the microphone by its Core Audio UID across launches, reconnections, sleep and audio service restarts.
+- Bounded retries, verification of every switch and a burst limit of five switches per ten seconds with automatic recovery.
+- Optional daily check for new stable releases on GitHub; installation stays manual.
+- Interface in English, Russian, Ukrainian, German, Spanish and Simplified Chinese, with an in-app language override.
+- Universal build for Apple Silicon and Intel, macOS 15 or later.
+- Drag-to-install disk image with a first-launch hint, a SHA-256 checksum and, for public builds, a signed build provenance attestation.

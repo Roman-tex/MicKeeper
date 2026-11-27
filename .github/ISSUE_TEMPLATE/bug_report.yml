@@ -1,0 +1,29 @@
+name: Bug report
+description: MicKeeper does not keep the microphone or behaves unexpectedly
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected and what MicKeeper did instead.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: MicKeeper version
+      description: Shown in About MicKeeper.
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version and Mac model
+      placeholder: macOS 26.1, MacBook Air M2
+    validations:
+      required: true
+  - type: textarea
+    id: devices
+    attributes:
+      label: Microphones involved
+      description: The selected microphone and the device that took over (AirPods, USB, webcam, virtual device).

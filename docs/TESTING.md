@@ -4,9 +4,10 @@ This file separates automated evidence from hardware checks. Support is targeted
 
 ## Automated coverage
 
-`swift test` exercises 37 test functions (including parameterized version/URL cases):
+`swift test` exercises 38 test functions (including parameterized version/URL cases):
 
 - Preferred input enforcement and avoidance of duplicate writes.
+- Restore counter increments only after a verified switch (drives the menu bar bounce).
 - Disabled state, immutable disabled selection, and persistence on stop/relaunch.
 - Device removal, rename and reconnection.
 - Cancellation of delayed work, including already queued callbacks.
@@ -29,7 +30,7 @@ The tests simulate external audio operations; passing them does not prove the be
 - Swift 6 mode; deployment target macOS 15.0.
 - Debug build and launch on the development Mac.
 - Universal Release build, strict signature verification and read-only DMG inspection are recorded in the local review result after packaging.
-- GitHub Actions configuration is supplied but has not run remotely before the first authorized push.
+- GitHub Actions runs the tests and builds the DMG on every push to `main`; a `v*` tag builds a draft release.
 
 ## Manual acceptance checklist
 
@@ -41,6 +42,7 @@ Record the OS version, hardware and outcome when each check is performed.
 | Disabled selection | Chosen name remains, device submenu grey/noninteractive; normal system changes are untouched. | Policy automated; UI check pending. |
 | Holding | Enable; change system default away; confirm return. | Policy automated; hardware check pending. |
 | Right click | Right-click icon twice; check switch and both icons follow each action once. | UI check pending. |
+| Menu bar symbol | Toggle holding: the microphone fills and empties (Magic Replace). Switch input away while holding: one bounce. Unplug the selected device: ellipsis badge. Enable Reduce Motion: changes are instant. Check light, dark and tinted menu bars. | UI check pending. |
 | USB / Bluetooth | Select device, disconnect, reconnect. | Policy automated; hardware check pending. |
 | Wake | Sleep and wake with selected device present and absent. | Hardware check pending. |
 | Audio service reset | On a dedicated test machine, restart audio service; confirm recovery. | Pending; do not disrupt the user's audio session. |
@@ -62,7 +64,7 @@ swift test
 ./scripts/package-dmg.sh
 codesign --verify --deep --strict .build/xcode/Build/Products/Release/MicKeeper.app
 lipo -archs .build/xcode/Build/Products/Release/MicKeeper.app/Contents/MacOS/MicKeeper
-hdiutil verify dist/MicKeeper-0.1.0-universal.dmg
+hdiutil verify dist/MicKeeper.dmg
 ```
 
 For an input-switch test, record the current system input first. Restore it through macOS after disabling holding. Do not terminate the audio service during calls or recordings. The Error submenu provides a retry action for audio and monitoring failures; burst limiting recovers automatically.
