@@ -6,6 +6,10 @@ if [[ -z "${DEVELOPER_DIR:-}" && -d /Applications/Xcode.app/Contents/Developer ]
     export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
 fi
 configuration="${1:-Release}"
+# Start release builds from a clean product so removed resources never linger.
+if [[ "$configuration" == Release ]]; then
+    rm -rf "$project_dir/.build/xcode/Build"
+fi
 if [[ "$configuration" != Debug && "$configuration" != Release ]]; then
     echo "Usage: scripts/build.sh [Debug|Release]" >&2
     exit 2

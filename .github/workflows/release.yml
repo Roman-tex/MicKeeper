@@ -1,0 +1,47 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+jobs:
+  release:
+    runs-on: xcode-27
+    timeout-minutes: 20
+    env:
+      # The app icon is an Icon Composer 27 document; older actool cannot read it.
+      DEVELOPER_DIR: /Applications/Xcode_27.2.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tests
+        run: swift test
+      - name: Build universal DMG
+        run: ./scripts/package-dmg.sh
+      - name: Check tag matches app version
+        run: |
+          version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' .build/xcode/Build/Products/Release/MicKeeper.app/Contents/Info.plist)"
+          test "v$version" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME does not match app version $version"; exit 1; }
+      # Signed build provenance, verifiable with `gh attestation verify`.
+      # GitHub offers attestations for public repositories on free plans.
+      - name: Attest build provenance
+        if: ${{ !github.event.repository.private }}
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/MicKeeper.dmg
+      # New tags get a draft to review and publish manually. Re-running the job
+      # for an existing release replaces its files and keeps the notes.
+      - name: Create or update release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dist/MicKeeper.dmg dist/MicKeeper.dmg.sha256 --clobber
+          else
+            notes="$(mktemp)"
+            awk '/^## /{n++} n==1' CHANGELOG.md | tail -n +2 > "$notes"
+            cat .github/release-install.md >> "$notes"
+            gh release create "$GITHUB_REF_NAME" dist/MicKeeper.dmg dist/MicKeeper.dmg.sha256 \
+              --draft --title "MicKeeper ${GITHUB_REF_NAME#v}" --notes-file "$notes"
+          fi
