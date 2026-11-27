@@ -87,9 +87,7 @@ struct AboutView: View {
         }
     }
     private var licenseText: String {
-        ["LICENSE", "THIRD_PARTY_NOTICES"].compactMap { name -> String? in
-            guard let url = Bundle.main.url(forResource: name, withExtension: "txt") else { return nil }
-            return try? String(contentsOf: url, encoding: .utf8)
-        }.joined(separator: "\n\n─────────────────────────────\n\n")
+        guard let url = Bundle.main.url(forResource: "LICENSE", withExtension: "txt") else { return "" }
+        return (try? String(contentsOf: url, encoding: .utf8)) ?? ""
     }
 }

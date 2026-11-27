@@ -6,6 +6,8 @@ import MicKeeperCore
 @MainActor final class AppDelegate: NSObject, NSApplicationDelegate {
     private var model: AppModel!
     private var statusItem: NSStatusItem!
+    private let statusIcon = StatusIconView()
+    private var shownRestorations = 0
     private let menu = NSMenu()
     private var isMenuTracking = false
     private var aboutWindow: NSWindowController?
@@ -20,7 +22,13 @@ import MicKeeperCore
             button.target = self; button.action = #selector(statusItemClicked(_:))
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
             button.setAccessibilityLabel(L10n.text("app.accessibility"))
+            button.addSubview(statusIcon)
+            NSLayoutConstraint.activate([
+                statusIcon.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+                statusIcon.centerYAnchor.constraint(equalTo: button.centerYAnchor)
+            ])
         }
+        shownRestorations = model.keeper.restorations
         menu.autoenablesItems = false
         updateAppearance()
         if !UserDefaults.standard.bool(forKey: "hasShownWelcome") {
@@ -238,10 +246,13 @@ import MicKeeperCore
         withObservationTracking {
             let _ = model.language.selectedIdentifier
             let enabled = model.keeper.isEnabled
-            let image = NSImage(named: enabled ? "MicrophoneOn" : "MicrophoneOff")?.copy() as? NSImage
-            image?.isTemplate = true
-            image?.size = NSSize(width: 18, height: 18)
-            statusItem.button?.image = image
+            let symbol = model.statusSymbol
+            let restorations = model.keeper.restorations
+            // A state change already animates; bounce only for a restore while holding.
+            let wasHolding = statusIcon.symbol == .holding
+            statusIcon.show(symbol)
+            if restorations > shownRestorations, wasHolding { statusIcon.acknowledgeRestore() }
+            shownRestorations = restorations
             let state = L10n.text(enabled ? "app.state.enabled" : "app.state.disabled")
             let device = model.keeper.selectedName ?? L10n.text("app.device.none")
             let detail = model.issueMessage ?? L10n.text("app.tooltip.rightClick")

@@ -63,6 +63,20 @@ import MicKeeperCore
         keeper.stop(); hardware.stopMonitoring(); hardware.onEvent = nil
         updates.stop()
     }
+    /// Disconnected devices are expected and recover on their own, so they read
+    /// as waiting. Soft monitoring warnings keep the normal icon.
+    var statusSymbol: StatusSymbol {
+        guard keeper.isEnabled else { return .off }
+        switch monitoringIssue {
+        case .none, .warning: break
+        case .unavailable, .hardware, .message: return .problem
+        }
+        switch keeper.issue {
+        case .none: return .holding
+        case .chooseDevice, .deviceUnavailable: return .waiting
+        case .audioFailure, .verificationFailed: return .problem
+        }
+    }
     var issueMessage: String? {
         if let monitoringIssue {
             switch monitoringIssue {
