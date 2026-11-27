@@ -47,6 +47,8 @@ mkdir -p "$mount_point"
 hdiutil attach -quiet -readwrite -nobrowse -noautoopen -mountpoint "$mount_point" "$rw_dmg"
 trap 'hdiutil detach -quiet -force "$mount_point" 2>/dev/null || true' EXIT
 "$venv/bin/python" -I scripts/dmg/remove-background-bookmark.py "$mount_point"
+# Mounting the image read-write lets fseventsd add its log folder; drop it.
+rm -rf "$mount_point/.fseventsd"
 hdiutil detach -quiet "$mount_point"
 trap - EXIT
 
